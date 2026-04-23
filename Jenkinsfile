@@ -81,12 +81,11 @@ pipeline {
     }
 
     stage('Deploy to Kubernetes') {
-      steps {
-        withEnv(["KUBECONFIG=/var/lib/jenkins/.kube/config"]) {
-          sh 'kubectl apply -f spring-boot-app-manifests/'
-        }
-      }
-    }
+  steps {
+    sh 'kubectl apply -f spring-boot-app-manifests/'
+  }
+}
+
 
   }
 
