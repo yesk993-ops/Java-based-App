@@ -12,7 +12,7 @@ pipeline {
       steps {
         git(
           branch: 'main',
-          url: 'https://github.com/yes993-ops/Java-based-App.git',
+          url: 'https://github.com/yesk993-ops/Java-based-App.git',
           credentialsId: 'github'
         )
       }
