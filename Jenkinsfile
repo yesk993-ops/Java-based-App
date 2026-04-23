@@ -20,6 +20,7 @@ pipeline {
 
     stage('Build and Test') {
       steps {
+         dir('spring-boot-app') 
         sh 'mvn clean package'
       }
     }
