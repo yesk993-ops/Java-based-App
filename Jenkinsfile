@@ -80,8 +80,9 @@ pipeline {
 
     stage('Deploy to Kubernetes') {
       steps {
-        echo "Deploying: mydocker3692/spring-boot-app:${BUILD_NUMBER}"
-        sh 'kubectl apply -f spring-boot-app-manifests/'
+        withEnv(["KUBECONFIG=/etc/kubernetes/admin.conf"]) {
+          sh 'kubectl apply -f spring-boot-app-manifests/'
+        }
       }
     }
 
