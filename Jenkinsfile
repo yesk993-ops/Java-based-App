@@ -7,7 +7,7 @@ pipeline {
       steps {
         git(
           branch: 'main',
-          url: 'https://github.com/yes993-ops/Java-based-App.git',
+          url: 'https://github.com/yesk993-ops/Java-based-App.git',
           credentialsId: 'github'
         )
       }
@@ -23,7 +23,7 @@ pipeline {
 
     stage('Static Code Analysis') {
       environment {
-        SONAR_URL = "http://192.168.122.151:9000/"
+        SONAR_URL = "http://192.168.88.128:9000/"
       }
       steps {
         dir('spring-boot-app') {
