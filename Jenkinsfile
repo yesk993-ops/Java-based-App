@@ -5,13 +5,15 @@ pipeline {
       args '--user root -v /var/run/docker.sock:/var/run/docker.sock' // mount Docker socket to access the host's Docker daemon
     }
   }
-  stages {
-    stage('Checkout') {
-      steps {
-        git branch: 'main', url: 'https://github.com/yesk993-ops/Java-based-App.git'
-        credentialsId: 'github'
-      }
-    }
+  stage('Checkout') {
+  steps {
+    git(
+      branch: 'main',
+      url: 'https://github.com/yes993-ops/Java-based-App.git',
+      credentialsId: 'github'
+    )
+  }
+}
     stage('Build and Test') {
       steps {
         // build the project and create a JAR file
