@@ -40,16 +40,18 @@ pipeline {
 
     stage('Build and Push Docker Image') {
       environment {
-        DOCKER_IMAGE = "mydocker3692/spring-boot-app:${BUILD_NUMBER}"
+        DOCKER_IMAGE = "mydocker3692/spring-boot-app:latest"
       }
       steps {
         script {
           dir('spring-boot-app') {
-            sh "docker build -t ${DOCKER_IMAGE} ."
+            // build with both tags (latest + build number)
+            sh "docker build -t ${DOCKER_IMAGE} -t mydocker3692/spring-boot-app:${BUILD_NUMBER} ."
           }
 
           docker.withRegistry('https://index.docker.io/v1/', 'docker-hub-cred') {
             sh "docker push ${DOCKER_IMAGE}"
+            sh "docker push mydocker3692/spring-boot-app:${BUILD_NUMBER}"
           }
         }
       }
@@ -66,11 +68,11 @@ pipeline {
             git config user.email "jenkins@example.com"
             git config user.name "Jenkins"
 
-            sed -i "s/replaceImageTag/${BUILD_NUMBER}/g" spring-boot-app-manifests/deployment.yml
-            sed -i "s|abhishekf5/ultimate-cicd|mydocker3692/spring-boot-app|g" spring-boot-app-manifests/deployment.yml
+            # Always set manifest to use latest tag
+            sed -i "s|image:.*|image: mydocker3692/spring-boot-app:latest|g" spring-boot-app-manifests/deployment.yml
 
             git add spring-boot-app-manifests/deployment.yml
-            git commit -m "Update deployment image to version ${BUILD_NUMBER}" || echo "No changes"
+            git commit -m "Update deployment image to latest" || echo "No changes"
 
             git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
           '''
