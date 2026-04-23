@@ -1,10 +1,5 @@
 pipeline {
-  agent {
-    docker {
-      image 'maven:3.8.4-openjdk-11'
-      args '--user root -v /var/run/docker.sock:/var/run/docker.sock'
-    }
-  }
+  agent any   // ✅ run on Jenkins node (must have docker + mvn installed)
 
   stages {
 
@@ -12,7 +7,7 @@ pipeline {
       steps {
         git(
           branch: 'main',
-          url: 'https://github.com/yesk993-ops/Java-based-App.git',
+          url: 'https://github.com/yes993-ops/Java-based-App.git',
           credentialsId: 'github'
         )
       }
@@ -53,10 +48,8 @@ pipeline {
             sh "docker build -t ${DOCKER_IMAGE} ."
           }
 
-          def dockerImage = docker.image("${DOCKER_IMAGE}")
-
           docker.withRegistry('https://index.docker.io/v1/', 'docker-cred') {
-            dockerImage.push()
+            sh "docker push ${DOCKER_IMAGE}"
           }
         }
       }
@@ -88,6 +81,7 @@ pipeline {
     stage('Deploy to Kubernetes') {
       steps {
         echo "Deploying: mydocker3692/spring-boot-app:${BUILD_NUMBER}"
+        // sh 'kubectl apply -f spring-boot-app-manifests/'
       }
     }
 
