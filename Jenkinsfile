@@ -9,6 +9,7 @@ pipeline {
     stage('Checkout') {
       steps {
         git branch: 'main', url: 'https://github.com/yes993-ops/Java-based-App.git'
+        credentialsId: 'github'
       }
     }
     stage('Build and Test') {
