@@ -20,8 +20,9 @@ pipeline {
 
     stage('Build and Test') {
       steps {
-         dir('spring-boot-app') 
-        sh 'mvn clean package'
+        dir('spring-boot-app') {
+          sh 'mvn clean package'
+        }
       }
     }
 
@@ -30,12 +31,14 @@ pipeline {
         SONAR_URL = "http://192.168.122.151:9000/"
       }
       steps {
-        withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
-          sh '''
-            mvn sonar:sonar \
-            -Dsonar.login=$SONAR_AUTH_TOKEN \
-            -Dsonar.host.url=$SONAR_URL
-          '''
+        dir('spring-boot-app') {
+          withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
+            sh '''
+              mvn sonar:sonar \
+              -Dsonar.login=$SONAR_AUTH_TOKEN \
+              -Dsonar.host.url=$SONAR_URL
+            '''
+          }
         }
       }
     }
@@ -46,7 +49,9 @@ pipeline {
       }
       steps {
         script {
-          sh "docker build -t ${DOCKER_IMAGE} ."
+          dir('spring-boot-app') {
+            sh "docker build -t ${DOCKER_IMAGE} ."
+          }
 
           def dockerImage = docker.image("${DOCKER_IMAGE}")
 
@@ -72,7 +77,7 @@ pipeline {
             sed -i "s|abhishekf5/ultimate-cicd|mydocker3692/spring-boot-app|g" spring-boot-app-manifests/deployment.yml
 
             git add spring-boot-app-manifests/deployment.yml
-            git commit -m "Update deployment image to version ${BUILD_NUMBER}" || echo "No changes to commit"
+            git commit -m "Update deployment image to version ${BUILD_NUMBER}" || echo "No changes"
 
             git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
           '''
@@ -82,8 +87,7 @@ pipeline {
 
     stage('Deploy to Kubernetes') {
       steps {
-        echo "Deploying to Kubernetes with image: mydocker3692/spring-boot-app:${BUILD_NUMBER}"
-        // sh 'kubectl apply -f spring-boot-app-manifests/'
+        echo "Deploying: mydocker3692/spring-boot-app:${BUILD_NUMBER}"
       }
     }
 
